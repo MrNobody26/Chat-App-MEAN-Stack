@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { io } from 'socket.io-client';
+import { SocketService } from 'src/app/services/socket-services';
 
 @Component({
   selector: 'app-home-landing-page',
@@ -11,11 +12,9 @@ import { io } from 'socket.io-client';
 })
 export class HomeLandingPageComponent {
   private socket: any;
-  constructor() {}
+  constructor(private socketService: SocketService) {}
 
   ngOnInit() {
-    this.socket = io('http://localhost:3000');
-
     this.socket.on('connect', () => {
       console.log('connected to server');
     });
@@ -25,7 +24,7 @@ export class HomeLandingPageComponent {
     });
   }
 
-  onClickMessageSend(data: String = '') {
+  onClickMessageSend(data: string = '') {
     console.log('submitted');
     this.emit('mesage_sent', { message: 'hello' });
   }
