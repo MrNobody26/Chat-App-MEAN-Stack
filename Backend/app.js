@@ -4,7 +4,7 @@ import { Server } from "socket.io";
 import http from "http";
 import cors from "cors";
 import mongoose from "mongoose";
-import userRouter from "./router/index.js";
+import { userRouter, messageRouter } from "./router/index.js";
 
 const app = express();
 
@@ -30,11 +30,6 @@ const io = new Server(server, {
   },
 });
 
-// app.use((req, res, next) => {
-//   // console.log(req);
-//   next();
-// });
-
 io.on("connection", (socket) => {
   console.log(`user connected to ${socket.id}`);
   socket.on("mesage_sent", (data) => {
@@ -43,7 +38,8 @@ io.on("connection", (socket) => {
   socket.broadcast.emit("recive_message", { data: "recieved from backend" });
 });
 
-app.use("/v1", userRouter);
+app.use("/v1/users", userRouter);
+app.use("/v1/message", messageRouter);
 
 server.listen(process.env.PORT, () => {
   console.log("listening on port: ", process.env.PORT);

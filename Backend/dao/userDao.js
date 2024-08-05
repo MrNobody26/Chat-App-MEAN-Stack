@@ -17,8 +17,8 @@ const findUserByPhoneNumber = async (phoneNumber) => {
 
 const addFriend = async (userPhoneNumber, friendsData) => {
   try {
-    return await User.findByIdAndUpdate(
-      userPhoneNumber,
+    return await User.findOneAndUpdate(
+      { phoneNumber: userPhoneNumber },
       { $push: { friends: friendsData } },
       { new: true }
     );
@@ -29,7 +29,7 @@ const addFriend = async (userPhoneNumber, friendsData) => {
 
 const getAllFriends = async (phoneNumber) => {
   try {
-    const user = await User.findById(phoneNumber).select("friends");
+    const user = await User.findOne(phoneNumber).select("friends");
     return user ? user.friends : [];
   } catch (e) {
     return e;

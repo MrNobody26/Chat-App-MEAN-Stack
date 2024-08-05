@@ -1,4 +1,3 @@
-import userDao from "../dao/userDao.js";
 import { userService, authServices } from "../service/index.js";
 
 const register = async (req, res) => {
@@ -23,13 +22,18 @@ const login = async (req, res) => {
   }
 
   const token = authServices.generateToken(phoneNumber);
-  res.status(200).json({ message: "login successful", token });
+  res.status(200).json({ message: "login successful", token, user: user });
 };
 
 const addFriend = async (req, res) => {
-  const { userId, name, phoneNumber } = req.body;
+  console.log("add friend");
+  const { name, phoneNumber } = req.body;
+  const userId = req.user.phoneNumber;
   try {
-    const friend = await userService.addFriend(userId, { name, phoneNumber });
+    const friend = await userService.addFriend(userId, {
+      phoneNumber,
+      name,
+    });
     res
       .status(200)
       .json({ message: "Friend added successfully", data: friend });
@@ -41,7 +45,7 @@ const addFriend = async (req, res) => {
 const getAllFriends = async (req, res) => {
   const userId = req.phoneNumber;
   try {
-    const friends = await userDao.getAllFriends(userId);
+    const friends = await userService.getFriends(userId);
     res
       .status(200)
       .json({ message: "Friend fetched successfully", data: friends });

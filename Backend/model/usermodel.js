@@ -1,9 +1,14 @@
 import mongoose from "mongoose";
 
-const FriendsSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  phoneNumber: { type: String, required: true, unique: true },
-});
+const FriendsSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
+  },
+  {
+    _id: false,
+  }
+);
 
 const UserSchema = new mongoose.Schema(
   {

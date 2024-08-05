@@ -3,16 +3,14 @@ import bcrypt from "bcryptjs";
 
 const register = async (username, password, phoneNumber) => {
   const hashedPassword = await bcrypt.hash(password, 10);
-  try {
-    return await userDao.createUser({
-      username,
-      password: hashedPassword,
-      phoneNumber,
-    });
-  } catch (e) {
-    return e;
-  }
+
+  return await userDao.createUser({
+    username,
+    password: hashedPassword,
+    phoneNumber,
+  });
 };
+
 const login = async (phoneNumber, password) => {
   const user = await userDao.findUserByPhoneNumber(phoneNumber);
   if (!user) {
@@ -23,12 +21,12 @@ const login = async (phoneNumber, password) => {
 };
 
 const addFriend = async (userId, friendsData) => {
-  try {
-    return await userDao.addFriend(userId, friendsData);
-  } catch (e) {
-    return e;
-  }
+  return await userDao.addFriend(userId, friendsData);
 };
 
-const userService = { register, login };
+const getFriends = async (userId) => {
+  return await userDao.getAllFriends(userId);
+};
+
+const userService = { register, login, addFriend, getFriends };
 export default userService;

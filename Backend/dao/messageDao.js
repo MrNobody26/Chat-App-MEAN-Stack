@@ -1,6 +1,6 @@
 import Message from "../model/index.js";
 
-const createMessage = async (from, to, content) => {
+const sendMessage = async (from, to, content) => {
   try {
     return await Message.create({ from, to, content });
   } catch (e) {
@@ -25,7 +25,7 @@ const getMessageBetweenUsers = async (
 };
 
 const messageDao = {
-  createMessage,
+  sendMessage,
   getMessageBetweenUsers,
 };
 

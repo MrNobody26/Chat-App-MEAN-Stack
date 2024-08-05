@@ -1,3 +1,4 @@
 import userController from "./userController.js";
+import messageController from "./messageController.js";
 
-export default userController;
+export { userController, messageController };
