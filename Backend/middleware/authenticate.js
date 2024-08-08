@@ -1,4 +1,4 @@
-import verifyToken from "../utils/index.js";
+import { verifyToken } from "../utils/index.js";
 
 const authenticate = async (req, res, next) => {
   const authToken = req.headers["authorization"];

@@ -1,8 +1,18 @@
 import { userService, authServices } from "../service/index.js";
+import { passwordValidator, phoneNumberValidator } from "../utils/index.js";
 
 const register = async (req, res) => {
   console.log("register called");
   const { username, phoneNumber, password } = req.body;
+
+  if (!passwordValidator(password)) {
+    res.status(400).json({ message: "Password criteria not meet" });
+  }
+
+  if (!phoneNumberValidator(phoneNumber)) {
+    res.status(400).json({ message: "Phone Number is Invalid " });
+  }
+
   try {
     const user = await userService.register(username, password, phoneNumber);
     res.status(200).json(user);
@@ -12,9 +22,17 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  console.log(req.headers);
   console.log("login called");
+  console.log(req.headers);
   const { phoneNumber, password } = req.body;
+
+  if (!passwordValidator(password)) {
+    res.status(400).json({ message: "Password criteria not meet" });
+  }
+
+  if (!phoneNumberValidator(phoneNumber)) {
+    res.status(400).json({ message: "Phone Number is Invalid " });
+  }
 
   const user = await userService.login(phoneNumber, password);
   if (!user) {
@@ -28,6 +46,11 @@ const login = async (req, res) => {
 const addFriend = async (req, res) => {
   console.log("add friend");
   const { name, phoneNumber } = req.body;
+
+  if (!phoneNumberValidator(phoneNumber)) {
+    res.status(400).json({ message: "Phone Number is Invalid " });
+  }
+
   const userId = req.user.phoneNumber;
   try {
     const friend = await userService.addFriend(userId, {
@@ -43,7 +66,8 @@ const addFriend = async (req, res) => {
 };
 
 const getAllFriends = async (req, res) => {
-  const userId = req.phoneNumber;
+  console.log("get friends");
+  const userId = req.user.phoneNumber;
   try {
     const friends = await userService.getFriends(userId);
     res

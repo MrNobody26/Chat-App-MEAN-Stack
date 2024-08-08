@@ -13,7 +13,7 @@ const FriendsSchema = new mongoose.Schema(
 const UserSchema = new mongoose.Schema(
   {
     phoneNumber: { type: String, required: true, unique: true },
-    username: { type: String, required: true, unique: true },
+    username: { type: String, required: true },
     password: { type: String, required: true },
     friends: [FriendsSchema],
   },
@@ -22,7 +22,16 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-UserSchema.index({ phoneNumber: 1 });
+UserSchema.index({ phoneNumber: 1 }, { unique: true });
+UserSchema.index(
+  { "friends.phoneNumber": 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      "friends.phoneNumber": { $exists: true, $ne: null },
+    },
+  }
+);
 
 const User = mongoose.model("User", UserSchema);
 
