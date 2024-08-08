@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { io } from 'socket.io-client';
 import { SocketService } from 'src/app/services/socket-services';
 
 @Component({
@@ -11,25 +10,20 @@ import { SocketService } from 'src/app/services/socket-services';
   styleUrls: ['./home-landing-page.component.scss'],
 })
 export class HomeLandingPageComponent {
-  private socket: any;
+  data: any;
   constructor(private socketService: SocketService) {}
 
   ngOnInit() {
-    this.socket.on('connect', () => {
-      console.log('connected to server');
-    });
-
-    this.socket.on('recive_message', (data: any = '') => {
-      console.log('recive_message', data);
+    this.socketService.on('private_message').subscribe((data: any) => {
+      console.log('Data', data);
     });
   }
 
   onClickMessageSend(data: string = '') {
-    console.log('submitted');
-    this.emit('mesage_sent', { message: 'hello' });
-  }
-
-  emit(eventName: string, data: any) {
-    this.socket.emit(eventName, data);
+    console.log('submitted', data);
+    this.socketService.emit('private_message', {
+      to: data,
+      content: 'hello first message',
+    });
   }
 }
