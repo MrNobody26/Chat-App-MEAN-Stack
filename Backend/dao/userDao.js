@@ -1,17 +1,18 @@
-import User from "../model/index.js";
+import { User } from "../model/index.js";
 
 const createUser = async (userData) => {
   try {
     return await User.create(userData);
   } catch (e) {
-    return e;
+    throw new Error(e);
   }
 };
+
 const findUserByPhoneNumber = async (phoneNumber) => {
   try {
     return await User.findOne({ phoneNumber });
   } catch (e) {
-    return e;
+    throw new Error(e);
   }
 };
 
@@ -23,7 +24,7 @@ const addFriend = async (userPhoneNumber, friendsData) => {
       { new: true }
     );
   } catch (e) {
-    return e;
+    throw new Error(e);
   }
 };
 
@@ -32,7 +33,22 @@ const getAllFriends = async (phoneNumber) => {
     const user = await User.findOne(phoneNumber).select("friends");
     return user ? user.friends : [];
   } catch (e) {
-    return e;
+    throw new Error(e);
+  }
+};
+
+const getOneFriendByPhoneNumber = async (
+  userPhoneNumber,
+  friendPhoneNumber
+) => {
+  try {
+    const userFriend = await User.findOne({
+      phoneNumber: userPhoneNumber,
+      "friends.phoneNumber": friendPhoneNumber,
+    });
+    return userFriend;
+  } catch (e) {
+    throw new Error(e);
   }
 };
 
@@ -41,6 +57,7 @@ const userDao = {
   findUserByPhoneNumber,
   getAllFriends,
   addFriend,
+  getOneFriendByPhoneNumber,
 };
 
 export default userDao;

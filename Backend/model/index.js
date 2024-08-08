@@ -1,3 +1,4 @@
 import User from "./usermodel.js";
+import Message from "./messageModel.js";
 
-export default User;
+export { User, Message };

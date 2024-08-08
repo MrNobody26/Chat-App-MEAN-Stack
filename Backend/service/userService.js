@@ -21,7 +21,15 @@ const login = async (phoneNumber, password) => {
 };
 
 const addFriend = async (userId, friendsData) => {
-  return await userDao.addFriend(userId, friendsData);
+  const userFriend = await userDao.getOneFriendByPhoneNumber(
+    userId,
+    friendsData.phoneNumber
+  );
+  if (userFriend) {
+    throw new Error("Friend already exists");
+  } else {
+    return await userDao.addFriend(userId, friendsData);
+  }
 };
 
 const getFriends = async (userId) => {

@@ -52,6 +52,7 @@ const addFriend = async (req, res) => {
   }
 
   const userId = req.user.phoneNumber;
+
   try {
     const friend = await userService.addFriend(userId, {
       phoneNumber,
@@ -61,7 +62,9 @@ const addFriend = async (req, res) => {
       .status(200)
       .json({ message: "Friend added successfully", data: friend });
   } catch (error) {
-    res.status(400).json({ message: "Adding contact failed", data: error });
+    res
+      .status(400)
+      .json({ message: "Adding friend failed", data: error.message });
   }
 };
 
