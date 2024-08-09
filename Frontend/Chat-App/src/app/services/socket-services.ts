@@ -7,9 +7,16 @@ import { Observable } from 'rxjs';
 })
 export class SocketService {
   private socket: Socket;
+  token = localStorage.getItem('token');
 
   constructor() {
-    this.socket = io('http://localhost:3000');
+    console.log('token', this.token);
+
+    this.socket = io('http://localhost:3000', {
+      extraHeaders: {
+        Authorization: `Bearer ${this.token}`,
+      },
+    });
   }
 
   //emit a event
