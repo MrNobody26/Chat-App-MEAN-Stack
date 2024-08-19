@@ -21,7 +21,7 @@ const addFriend = async (userPhoneNumber, friendsData) => {
     return await User.findOneAndUpdate(
       { phoneNumber: userPhoneNumber },
       { $push: { friends: friendsData } },
-      { new: true }
+      { new: true, runValidators: true }
     );
   } catch (e) {
     throw new Error(e);

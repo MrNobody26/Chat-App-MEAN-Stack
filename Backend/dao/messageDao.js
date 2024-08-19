@@ -1,10 +1,10 @@
 import { Message } from "../model/index.js";
 import { userDao } from "../dao/index.js";
 
-const sendMessage = async (from, to, content) => {
+const sendMessage = async (from, to, content, toModel) => {
   console.log(`from ${from} to ${to} content ${content} `);
   try {
-    return await Message.create({ from, to, content });
+    return await Message.create({ from, to, content, toModel });
   } catch (e) {
     throw new Error(e);
   }
@@ -31,32 +31,37 @@ const getMessageBetweenUsers = async (
         { to: userOnePhoneNumberId._id, from: userTwoPhoneNumberId._id },
       ],
     })
-      .populate([
-        {
-          path: "from",
-          model: "User",
-          select: "phoneNumber friends",
-          populate: {
-            path: "friends",
-            model: "User",
-            select: "phoneNumber ",
-          },
-        },
-        {
-          path: "to",
-          model: "User",
-          select: "phoneNumber",
-        },
-      ])
+      .populate("from", "username phoneNumber")
+      .populate("to", "username phoneNumber")
       .sort("timeStamp");
   } catch (e) {
+    console.log("error", e.message);
     throw new Error(e);
+  }
+};
+
+const getMessageInGroup = async (groupId) => {
+  try {
+    return await Message.find({
+      to: groupId,
+      toModel: "Group",
+    })
+      .populate("from", "username phoneNumber")
+      .populate({
+        path: "to",
+        select: "groupName",
+      })
+      .select("content timeStamp")
+      .sort("timeStamp");
+  } catch (e) {
+    throw new Error(`Failed to get messages in group: ${e.message}`);
   }
 };
 
 const messageDao = {
   sendMessage,
   getMessageBetweenUsers,
+  getMessageInGroup,
 };
 
 export default messageDao;
