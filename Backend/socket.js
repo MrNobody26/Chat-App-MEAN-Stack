@@ -1,5 +1,6 @@
 import { messageService } from "./service/index.js";
 import { verifyToken } from "./utils/index.js";
+import cloudinary from "./utils/imageUploaderCloudinary.js";
 
 const users = {};
 
@@ -37,12 +38,46 @@ export const socketSetUp = (io) => {
       const toSocketId = users[to];
 
       if (toSocketId) {
-        io.to(toSocketId).emit("private_message", {
-          from,
-          content,
-        });
+        if (content.type === "image") {
+          const base64Data = content.content.replace(
+            /^data:image\/\w+;base64,/,
+            ""
+          );
+
+          const buffer = Buffer.from(base64Data, "base64");
+
+          try {
+            const uploadStream = await new Promise((resolve, reject) => {
+              cloudinary.uploader
+                .upload_stream(
+                  {
+                    folder: "chat_images",
+                  },
+                  (error, result) => {
+                    if (error) {
+                      return reject(error);
+                    }
+                    resolve(result);
+                  }
+                )
+                .end(buffer);
+            });
+            content.content = uploadStream.secure_url || uploadStream.url;
+          } catch (error) {
+            socket.emit("error", {
+              message: "Server error Image not Saved",
+            });
+            console.error("Upload failed:", error);
+          }
+        }
+
         try {
           await messageService.sendMessage(from, to, content);
+
+          io.to(toSocketId).emit("private_message", {
+            from,
+            content,
+          });
         } catch (e) {
           socket.emit("error", {
             message: "Server error Message Not saved",
