@@ -6,7 +6,7 @@ const userRouter = Router();
 
 userRouter.post("/register", userController.register);
 userRouter.post("/login", userController.login);
-userRouter.post("/add-friend", authenticate, userController.addFriend);
+userRouter.patch("/add-friend", authenticate, userController.addFriend);
 userRouter.get("/get-friends", authenticate, userController.getAllFriends);
 
 export default userRouter;

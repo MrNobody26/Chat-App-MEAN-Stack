@@ -77,7 +77,9 @@ const getAllFriends = async (req, res) => {
       .status(200)
       .json({ message: "Friend fetched successfully", data: friends });
   } catch (error) {
-    res.status(400).json({ message: "Failed getting friends", data: error });
+    res
+      .status(400)
+      .json({ message: "Failed getting friends", data: error.message });
   }
 };
 

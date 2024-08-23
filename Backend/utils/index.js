@@ -1,6 +1,6 @@
 import verifyToken from "./jwtTokenVerify.js";
 import passwordValidator from "./passwordValidator.js";
 import phoneNumberValidator from "./phoneNumberValidator.js";
-import cloudinary from "./imageUploaderCloudinary.js";
+import uploadImage from "./imageUploaderCloudinary.js";
 
-export { verifyToken, passwordValidator, phoneNumberValidator, cloudinary };
+export { verifyToken, passwordValidator, phoneNumberValidator, uploadImage };
