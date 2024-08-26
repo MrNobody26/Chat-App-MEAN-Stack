@@ -36,5 +36,20 @@ const getFriends = async (userId) => {
   return await userDao.getAllFriends(userId);
 };
 
-const userService = { register, login, addFriend, getFriends };
+const findUserByPhoneNumber = async (phoneNumber) => {
+  try {
+    const user = await userDao.findUserByPhoneNumber(phoneNumber);
+    return user ? user : null;
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+const userService = {
+  register,
+  login,
+  addFriend,
+  getFriends,
+  findUserByPhoneNumber,
+};
 export default userService;

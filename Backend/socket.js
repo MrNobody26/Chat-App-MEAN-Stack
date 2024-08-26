@@ -1,6 +1,6 @@
-import { messageService } from "./service/index.js";
+import { messageService, groupService } from "./service/index.js";
 import { verifyToken } from "./utils/index.js";
-import cloudinary from "./utils/imageUploaderCloudinary.js";
+import { uploadImage } from "./utils/index.js";
 
 const users = {};
 
@@ -39,36 +39,14 @@ export const socketSetUp = (io) => {
 
       if (toSocketId) {
         if (content.type === "image") {
-          const base64Data = content.content.replace(
-            /^data:image\/\w+;base64,/,
-            ""
-          );
+          const { error, url } = await uploadImage(content.content);
 
-          const buffer = Buffer.from(base64Data, "base64");
-
-          try {
-            const uploadStream = await new Promise((resolve, reject) => {
-              cloudinary.uploader
-                .upload_stream(
-                  {
-                    folder: "chat_images",
-                  },
-                  (error, result) => {
-                    if (error) {
-                      return reject(error);
-                    }
-                    resolve(result);
-                  }
-                )
-                .end(buffer);
-            });
-            content.content = uploadStream.secure_url || uploadStream.url;
-          } catch (error) {
-            socket.emit("error", {
-              message: "Server error Image not Saved",
-            });
-            console.error("Upload failed:", error);
+          if (error) {
+            socket.emit("error", { message: error });
+            return;
           }
+
+          content.content = url;
         }
 
         try {
@@ -89,6 +67,102 @@ export const socketSetUp = (io) => {
         socket.emit("error", {
           message: "Server error",
           data: "User not connected",
+        });
+      }
+    });
+
+    io.on("group_message", async (groupId, content, toModel = "Group") => {
+      const from = socket.userId;
+      let group;
+      try {
+        group = await groupService.getGroupById(groupId);
+      } catch (e) {
+        socket.emit("error", {
+          message: "Incorrect group Id",
+          data: e.message,
+        });
+      }
+
+      const members = group.members;
+
+      if (content.type === "image") {
+        const { error, url } = await uploadImage(content.content);
+
+        if (error) {
+          socket.emit("error", { message: error });
+          return;
+        }
+
+        content.content = url;
+      }
+
+      try {
+        await groupService.sendMessageInGroup(from, groupId, content, toModel);
+
+        members.forEach(({ userId }) => {
+          const memberSocketId = users[userId.phoneNumber];
+          if (memberSocketId && userId.phoneNumber !== from) {
+            io.to(memberSocketId).emit("group_message", {
+              from,
+              groupId,
+              content,
+            });
+          }
+        });
+      } catch (e) {
+        socket.emit("error", { message: e });
+        return;
+      }
+    });
+
+    io.on("create_group", async ({ groupName, description, members }) => {
+      const adminId = socket.userId;
+      try {
+        const group = await groupService.createGroup(
+          groupName,
+          description,
+          adminId,
+          members
+        );
+        socket.emit("group_created", group);
+      } catch (e) {
+        socket.emit("error", { message: e });
+        return;
+      }
+    });
+
+    socket.on("add_user_to_group", async ({ groupId, userId }) => {
+      try {
+        await groupService.addUserToGroup(groupId, userId);
+        socket.emit("user_added_to_group", { groupId, userId });
+      } catch (error) {
+        socket.emit("error", {
+          message: "Server error: User not added to group",
+          data: error,
+        });
+      }
+    });
+
+    socket.on("remove_user_from_group", async ({ groupId, userId }) => {
+      try {
+        await groupService.removeUserFromGroup(groupId, userId);
+        socket.emit("user_removed_from_group", { groupId, userId });
+      } catch (error) {
+        socket.emit("error", {
+          message: "Server error: User not removed from group",
+          data: error,
+        });
+      }
+    });
+
+    socket.on("delete_Group", async ({ groupId, userId }) => {
+      try {
+        await groupService.deleteGroupAndCleanUp(groupId, userId);
+        socket.emit("group_deleted", { groupId });
+      } catch (error) {
+        socket.emit("error", {
+          message: "Server error: User not removed from group",
+          data: error,
         });
       }
     });

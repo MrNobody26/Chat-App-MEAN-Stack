@@ -5,7 +5,7 @@ import http from "http";
 import cors from "cors";
 import mongoose from "mongoose";
 
-import { userRouter, messageRouter } from "./router/index.js";
+import { userRouter, messageRouter, groupRouter } from "./router/index.js";
 import { socketSetUp } from "./socket.js";
 
 const app = express();
@@ -15,6 +15,7 @@ app.use(express.json());
 
 app.use("/v1/users", userRouter);
 app.use("/v1/message", messageRouter);
+app.use("/v1/group", groupRouter);
 
 const dbConnection = process.env.MONGO_DB_URL;
 mongoose

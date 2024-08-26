@@ -1,4 +1,4 @@
-import { messageDao, userDao } from "../dao/index.js";
+import { messageDao, userDao, groupDao } from "../dao/index.js";
 
 const sendMessage = async (from, to, content, toModel) => {
   const fromUser = await userDao.findUserByPhoneNumber(from);
@@ -20,6 +20,11 @@ const getMessages = async (userOneId, userTwoId) => {
 };
 
 const getMessagesInGroup = async (groupId) => {
+  const group = await groupDao.getGroupById(groupId);
+  if (!group) {
+    throw new Error("Group does not exist");
+  }
+
   return await messageDao.getMessageInGroup(groupId);
 };
 

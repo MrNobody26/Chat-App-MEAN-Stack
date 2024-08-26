@@ -31,15 +31,22 @@ const getMessages = async (req, res) => {
     res.status(500).json({ message: "Failed to get messages", data: error });
   }
 };
-const uploadImage = async (req, res) => {
-  console.log("in upload image");
-  console.log(req);
+
+const getGroupMessages = async (groupId) => {
+  try {
+    const messages = await Message.find({ to: groupId, toModel: "Group" })
+      .populate("from", "username")
+      .sort({ timeStamp: 1 });
+    return messages;
+  } catch (error) {
+    throw new Error(`Error retrieving messages: ${error.message}`);
+  }
 };
 
 const messageController = {
   sendMessage,
   getMessages,
-  uploadImage,
+  getGroupMessages,
 };
 
 export default messageController;

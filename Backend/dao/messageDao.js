@@ -6,7 +6,7 @@ const sendMessage = async (from, to, content, toModel) => {
   try {
     return await Message.create({ from, to, content, toModel });
   } catch (e) {
-    throw new Error(e);
+    throw new Error(e.message);
   }
 };
 
@@ -36,7 +36,7 @@ const getMessageBetweenUsers = async (
       .sort("timeStamp");
   } catch (e) {
     console.log("error", e.message);
-    throw new Error(e);
+    throw new Error(e.message);
   }
 };
 
@@ -54,7 +54,8 @@ const getMessageInGroup = async (groupId) => {
       .select("content timeStamp")
       .sort("timeStamp");
   } catch (e) {
-    throw new Error(`Failed to get messages in group: ${e.message}`);
+    console.log(`Failed to get messages in group: ${e.message}`);
+    throw new Error(e.message);
   }
 };
 
