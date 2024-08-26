@@ -2,15 +2,20 @@ import { groupDao, messageDao, userDao } from "../dao/index.js";
 
 const getGroupById = async (groupId) => {
   try {
-    return await groupDao.findById(groupId);
+    return await groupDao.getGroupById(groupId);
   } catch (e) {
     throw new Error(e.message);
   }
 };
 
-const sendMessageInGroup = async (userId, groupId, content, toModel) => {
+const sendMessageInGroup = async (
+  userId,
+  groupId,
+  content,
+  toModel = "Group"
+) => {
   const fromUser = await userDao.findUserByPhoneNumber(userId);
-  const toGroup = await groupDao.findById(groupId);
+  const toGroup = await groupDao.getGroupById(groupId);
 
   if (!fromUser || !toGroup) {
     throw new Error("Couldn't find User Or Group");
@@ -83,7 +88,6 @@ const removeUserFromGroup = async (userId, groupId, adminUser) => {
   }
 
   const user = await userDao.findUserByPhoneNumber(userId);
-  console.log("User in service", user);
   const adminUserId = await userDao.findUserByPhoneNumber(adminUser);
 
   if (!user) {

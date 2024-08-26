@@ -45,7 +45,6 @@ const getGroupMembers = async (groupId) => {
 };
 
 const getGroupById = async (groupId) => {
-  console.log("groupId in DAO ", groupId);
   try {
     return await Group.findById(groupId)
       .populate("admin", "username")

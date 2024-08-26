@@ -1,13 +1,12 @@
-import { groupService, messageService, userService } from "../service/index.js";
+import { groupService, messageService } from "../service/index.js";
 
 const sendMessage = async (req, res) => {
   const userId = req.user.phoneNumber;
-  const { groupId, content, toModel } = req.body;
-
+  const { to, content, toModel } = req.body;
   try {
     const message = await groupService.sendMessageInGroup(
       userId,
-      groupId,
+      to,
       content,
       toModel
     );
